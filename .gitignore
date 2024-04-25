@@ -22,7 +22,4 @@ node_modules/gulp-shell
 node_modules/require-dir
 node_modules/winston
 assets/html/google*
-public/*
-lib/*
-log/*
 node_modules
