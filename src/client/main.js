@@ -11,7 +11,7 @@ var ctx_full = document.getElementById('canvas_full').getContext('2d'),
   settings_string;
 
 function draw(ev) {
-  var f = document.getElementById("uploadimage").files[0];
+  var f = document.getElementById('uploadimage').files[0];
   img = new Image();
   src = url.createObjectURL(f);
 
@@ -25,8 +25,7 @@ function draw(ev) {
 
   img.src = src;
   original_img.src = src;
-  img.onload = function() {
-
+  img.onload = function () {
     url.revokeObjectURL(src);
 
     // calculate possible numbers for next step
@@ -69,8 +68,8 @@ function selectnumber(ev) {
   map_parts_vertical = $('#number_vertical').val();
   map_parts_horizontal = $('#number_horizontal').val();
 
-  var canvasCopy = document.createElement("canvas");
-  var copyContext = canvasCopy.getContext("2d");
+  var canvasCopy = document.createElement('canvas');
+  var copyContext = canvasCopy.getContext('2d');
   var maxWidth = 128 * map_parts_horizontal,
     maxHeight = 128 * map_parts_vertical;
 
@@ -88,8 +87,8 @@ function selectnumber(ev) {
   canvasCopy.height = img.height;
   copyContext.drawImage(img, 0, 0);
 
-  spaceH = (maxHeight - (img.height * ratio)) / 2;
-  spaceW = (maxWidth - (img.width * ratio)) / 2;
+  spaceH = (maxHeight - img.height * ratio) / 2;
+  spaceW = (maxWidth - img.width * ratio) / 2;
 
   canvas_full.width = 128 * map_parts_horizontal;
   canvas_full.height = 128 * map_parts_vertical;
@@ -102,9 +101,17 @@ function selectnumber(ev) {
   } else {
     ctx_full.imageSmoothingEnabled = true;
   }
-  ctx_full.drawImage(canvasCopy, 0, 0,
-    canvasCopy.width, canvasCopy.height,
-    spaceW, spaceH, img.width * ratio, img.height * ratio);
+  ctx_full.drawImage(
+    canvasCopy,
+    0,
+    0,
+    canvasCopy.width,
+    canvasCopy.height,
+    spaceW,
+    spaceH,
+    img.width * ratio,
+    img.height * ratio
+  );
 
   var canvas_full_scaled = document.getElementById('canvas_full_scaled');
   var ctx_full_scaled = canvas_full_scaled.getContext('2d');
@@ -112,7 +119,7 @@ function selectnumber(ev) {
 
   selected_ratio = map_parts_horizontal / map_parts_vertical;
   if (map_parts_horizontal >= map_parts_vertical) {
-    ctx_full_scaled.drawImage(canvas_full, 0, 0, 256, 256 * (1/selected_ratio));
+    ctx_full_scaled.drawImage(canvas_full, 0, 0, 256, 256 * (1 / selected_ratio));
   } else {
     ctx_full_scaled.drawImage(canvas_full, 0, 0, 256 * selected_ratio, 256);
   }
@@ -122,7 +129,11 @@ function selectnumber(ev) {
 
   settings_string += '<tr><td>Map parts horizontal</td><td>' + map_parts_horizontal + '</td></tr>';
   settings_string += '<tr><td>Map parts vertical</td><td>' + map_parts_vertical + '</td></tr>';
-  $('#list_settings').html('<table style="margin-left: auto; margin-right: auto; width: 300px">' + settings_string + '</table>');
+  $('#list_settings').html(
+    '<table style="margin-left: auto; margin-right: auto; width: 300px">' +
+      settings_string +
+      '</table>'
+  );
 
   drawCanvas(0, 0);
   map_x = 0;
@@ -150,8 +161,7 @@ function drawCanvas(x, y) {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.drawImage(canvas_full, 128 * x, 128 * y, 128, 128,
-    0, 0, 128, 128);
+  ctx.drawImage(canvas_full, 128 * x, 128 * y, 128, 128, 0, 0, 128, 128);
   ctx.scale(4, 4);
   if (x === 0 && y === 0) {
     $('.prev-map').addClass('hidden');
@@ -191,20 +201,21 @@ function reducecolors(ev) {
   $('#reducecolors').addClass('hidden');
   var ctx = document.getElementById('canvas_full').getContext('2d');
   var pixelData = ctx.getImageData(0, 0, 128 * map_parts_horizontal, 128 * map_parts_vertical);
-  
-  var worker = new Worker("reduce_colors_worker.js");
 
-  worker.postMessage({pixelData: pixelData,
+  var worker = new Worker('reduce_colors_worker.js');
+
+  worker.postMessage({
+    pixelData: pixelData,
     new_colors: Cookies.get('newColors') || '181',
     colourSpace: Cookies.get('colourSpace') || 'laba',
     dithering: Cookies.get('dithering') || 'no',
-    transparency: Cookies.get('transparency') || '50'
+    transparency: Cookies.get('transparency') || '50',
   });
 
   var time_start = new Date();
   var duration = 0;
 
-  worker.onmessage = function(oEvent) {
+  worker.onmessage = function (oEvent) {
     if (oEvent.data.step == 'finished') {
       ctx.putImageData(oEvent.data.pixelData, 0, 0);
       all_maps_data = oEvent.data.all_maps_data;
@@ -212,7 +223,7 @@ function reducecolors(ev) {
       // redraw scaled and now color reduced version of ctx_full onto canvas#canvas_full_scaled
       var ctx_full_scaled = document.getElementById('canvas_full_scaled').getContext('2d');
       if (map_parts_horizontal >= map_parts_vertical) {
-        ctx_full_scaled.drawImage(canvas_full, 0, 0, 256, 256 * (1/selected_ratio));
+        ctx_full_scaled.drawImage(canvas_full, 0, 0, 256, 256 * (1 / selected_ratio));
       } else {
         ctx_full_scaled.drawImage(canvas_full, 0, 0, 256 * selected_ratio, 256);
       }
@@ -244,7 +255,6 @@ function reducecolors(ev) {
       console.log(oEvent.data.message);
     }
   };
-
 }
 
 function createfile(ev) {
@@ -258,7 +268,7 @@ function createfile(ev) {
 
   var mapnumber = parseInt($('#map_number').val(), 10) || 0;
 
-  var randomid = "";
+  var randomid = '';
   if (map_parts_horizontal > 1 || map_parts_vertical > 1) {
     randomid = makerandomid();
   }
@@ -272,44 +282,64 @@ function createfile(ev) {
         var co;
         for (var k = 0; k < 128; k++) {
           for (var l = 0; l < 128; l++) {
-            co = all_maps_data[((j * map_parts_horizontal * 128 * 128) + i * 128) +
-              l + map_parts_horizontal * 128 * k];
+            co =
+              all_maps_data[
+                j * map_parts_horizontal * 128 * 128 + i * 128 + l + map_parts_horizontal * 128 * k
+              ];
             if (co > 127) {
               co = co - 256;
             }
             map_item.push(co);
           }
         }
-        (function() {
+        (function () {
           var x = i;
           var y = j;
-          $.post('createfile', {
-            map_item: JSON.stringify(map_item),
-            x_center: xcenter,
-            z_center: zcenter,
-            dimension: dim,
-            randomid: randomid
-          }, function(data) {
-            responses[y + map_parts_vertical * x] = data;
-            responses_count++;
-            updateResponse('zip_file_part', {done_count: responses_count, map_count: map_parts_horizontal * map_parts_vertical});
-            if (responses_count === map_parts_horizontal * map_parts_vertical) {
-              if (responses_count == 1) {
-                updateResponse('single_file_finished', {filename: responses[0], mapnumber: mapnumber, time_start: time_start});
-              } else {
-                $.post('createzip', {
-                  mapfiles: JSON.stringify(responses),
-                  zipname: randomid,
-                  mapnumber: mapnumber
-                }, function(data) {
-                  updateResponse('zip_file_finished', {filename: data, time_start: time_start});
-                });
+          $.post(
+            'createfile',
+            {
+              map_item: JSON.stringify(map_item),
+              x_center: xcenter,
+              z_center: zcenter,
+              dimension: dim,
+              randomid: randomid,
+            },
+            function (data) {
+              responses[y + map_parts_vertical * x] = data;
+              responses_count++;
+              updateResponse('zip_file_part', {
+                done_count: responses_count,
+                map_count: map_parts_horizontal * map_parts_vertical,
+              });
+              if (responses_count === map_parts_horizontal * map_parts_vertical) {
+                if (responses_count == 1) {
+                  updateResponse('single_file_finished', {
+                    filename: responses[0],
+                    mapnumber: mapnumber,
+                    time_start: time_start,
+                  });
+                } else {
+                  $.post(
+                    'createzip',
+                    {
+                      mapfiles: JSON.stringify(responses),
+                      zipname: randomid,
+                      mapnumber: mapnumber,
+                    },
+                    function (data) {
+                      updateResponse('zip_file_finished', {
+                        filename: data,
+                        time_start: time_start,
+                      });
+                    }
+                  );
+                }
               }
             }
-          }).error(function() {
+          ).error(function () {
             updateResponse('error');
           });
-        }());
+        })();
       }
     }
   }
@@ -347,43 +377,52 @@ function updateResponse(step, data) {
   var response_text, notification;
 
   if (step == 'single_file_finished') {
-    response_text = '<a href="tmp/' + data['filename'] + '.dat?mapnumber=' +
-        data['mapnumber'] + '">Download</a>' + " (map_" + data['mapnumber'] + ".dat)";
+    response_text =
+      '<a href="tmp/' +
+      data['filename'] +
+      '.dat?mapnumber=' +
+      data['mapnumber'] +
+      '">Download</a>' +
+      ' (map_' +
+      data['mapnumber'] +
+      '.dat)';
     $('#ajaxreply').html(response_text);
     duration = Math.abs(data.time_start - new Date()) / 1000;
     $('#ajaxreply_time').parent().removeClass('hidden');
     $('#ajaxreply_time').html('Creating map file took ' + duration + ' seconds.');
     $('#tabs a[href="#step5"]').tab('show');
-    if ($('#notification').is(':checked') && Notification.permission === "granted") {
-      notification = new Notification("MC Map Item Tool", {
-        body: "Creating map file finished in " + duration + " seconds."
+    if ($('#notification').is(':checked') && Notification.permission === 'granted') {
+      notification = new Notification('MC Map Item Tool', {
+        body: 'Creating map file finished in ' + duration + ' seconds.',
       });
     }
   } else if (step == 'zip_file_finished') {
     console.log(data);
-    response_text = '<a href="tmp/' + data['filename'] + '.zip">Download</a>' + " (Zip archive with map files)";
+    response_text =
+      '<a href="tmp/' + data['filename'] + '.zip">Download</a>' + ' (Zip archive with map files)';
     $('#ajaxreply').html(response_text);
     duration = Math.abs(data.time_start - new Date()) / 1000;
     $('#ajaxreply_time').parent().removeClass('hidden');
     $('#ajaxreply_time').html('Creating map files took ' + duration + ' seconds.');
     $('#tabs a[href="#step5"]').tab('show');
-    if ($('#notification').is(':checked') && Notification.permission === "granted") {
-      notification = new Notification("MC Map Item Tool", {
-        body: "Creating map files finished in " + duration + " seconds."
+    if ($('#notification').is(':checked') && Notification.permission === 'granted') {
+      notification = new Notification('MC Map Item Tool', {
+        body: 'Creating map files finished in ' + duration + ' seconds.',
       });
     }
   } else if (step == 'zip_file_part') {
-    response_text = "Creating maps: " + data['done_count'] + " of " + data['map_count'] + " done.";
+    response_text = 'Creating maps: ' + data['done_count'] + ' of ' + data['map_count'] + ' done.';
     $('#ajaxreply').html(response_text);
     $('#tabs a[href="#step5"]').tab('show');
   } else if (step == 'error') {
-    response_text = "The server returned an error. If you think, this is a malfunction, please report it (via github, twitter, ..).";
+    response_text =
+      'The server returned an error. If you think, this is a malfunction, please report it (via github, twitter, ..).';
     $('#ajaxreply').html(response_text);
     $('#instruction').addClass('hidden');
     $('#tabs a[href="#step5"]').tab('show');
-    if ($('#notification').is(':checked') && Notification.permission === "granted") {
-      notification = new Notification("MC Map Item Tool", {
-        body: response_text
+    if ($('#notification').is(':checked') && Notification.permission === 'granted') {
+      notification = new Notification('MC Map Item Tool', {
+        body: response_text,
       });
     }
   }
@@ -411,24 +450,25 @@ function updateResponse(step, data) {
 
 function list_settings() {
   var colorSchemeToText = {
-    'no': 'Old colors',
-    'yes': 'Version 1.7.2 (2013)',
-    '181': 'Version 1.8.1 (2014)',
+    no: 'Old colors',
+    yes: 'Version 1.7.2 (2013)',
+    181: 'Version 1.8.1 (2014)',
     '17w06a': 'Snapshot 17w06a',
-    '112': 'Version 1.12 (2017)'
+    112: 'Version 1.12 (2017)',
+    120: 'Version 1.20 (2023)',
   };
   var dimensionToText = {
-    '0': 'Overworld',
-    '1': 'Nether',
-    '2': 'End'
+    0: 'Overworld',
+    1: 'Nether',
+    2: 'End',
   };
   var ditheringToText = {
-    'no': 'No dithering',
-    'floydsteinberg': 'Floyd-Steinberg',
+    no: 'No dithering',
+    floydsteinberg: 'Floyd-Steinberg',
   };
   var interpolationToText = {
-    'standard': 'Standard',
-    'nearest_neighbor': 'Nearest Neighbor'
+    standard: 'Standard',
+    nearest_neighbor: 'Nearest Neighbor',
   };
   var sett_colorSpace = Cookies.get('colourSpace') || 'laba';
   var sett_colorScheme = colorSchemeToText[Cookies.get('newColors') || 'yes'];
@@ -445,16 +485,18 @@ function list_settings() {
   settings_string += '<tr><td>X Center</td><td>' + sett_xCenter + '</td></tr>';
   settings_string += '<tr><td>Z Center</td><td>' + sett_zCenter + '</td></tr>';
   settings_string += '<tr><td>Dimension</td><td>' + sett_dimension + '</td></tr>';
-  $('#list_settings').html('<table style="margin-left: auto; margin-right: auto; width: 300px">' + settings_string + '</table>');
+  $('#list_settings').html(
+    '<table style="margin-left: auto; margin-right: auto; width: 300px">' +
+      settings_string +
+      '</table>'
+  );
 }
 
-
 function makerandomid() {
-  var text = "";
-  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var text = '';
+  var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-  for (var i = 0; i < 10; i++)
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  for (var i = 0; i < 10; i++) text += possible.charAt(Math.floor(Math.random() * possible.length));
 
   return text;
 }
@@ -468,27 +510,27 @@ var all_maps_data;
 var map_x;
 var map_y;
 
-document.getElementById("uploadimage").addEventListener("change", draw, false);
-document.getElementById("selectnumberofparts").addEventListener("click", selectnumber, false);
-document.getElementById("reducecolors").addEventListener("click", reducecolors, false);
-document.getElementById("createfile").addEventListener("click", createfile, false);
+document.getElementById('uploadimage').addEventListener('change', draw, false);
+document.getElementById('selectnumberofparts').addEventListener('click', selectnumber, false);
+document.getElementById('reducecolors').addEventListener('click', reducecolors, false);
+document.getElementById('createfile').addEventListener('click', createfile, false);
 
-document.getElementById("prevmap").addEventListener("click", prevMap, false);
-document.getElementById("nextmap").addEventListener("click", nextMap, false);
+document.getElementById('prevmap').addEventListener('click', prevMap, false);
+document.getElementById('nextmap').addEventListener('click', nextMap, false);
 
-$(document).ready(function() {
+$(document).ready(function () {
   // console.log('dom ready');
   $('.step-0-image').addClass('hidden');
   $('.step-0-canvas').addClass('hidden');
   $('#reducecolors_time').parent().addClass('hidden');
   $('#ajaxreply_time').parent().addClass('hidden');
   $('#tabs').addClass('hidden');
-  if (!("Notification" in window)) {
+  if (!('Notification' in window)) {
     // This browser does not support notifications
     $('.notification-form-div').addClass('hidden');
   } else {
-    $('#notification').change(function() {
-      if(this.checked) {
+    $('#notification').change(function () {
+      if (this.checked) {
         if (Notification.permission !== 'denied') {
           Notification.requestPermission();
         }

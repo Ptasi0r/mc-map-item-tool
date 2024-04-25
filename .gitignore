@@ -25,3 +25,4 @@ assets/html/google*
 public/*
 lib/*
 log/*
+node_modules
