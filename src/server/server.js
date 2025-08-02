@@ -79,7 +79,9 @@ var handlers = {
   logReferer(req) {
     var referer = req.headers.referer;
     if (referer) {
-      var host = req.headers['x-forwarded-host'] ? req.headers['x-forwarded-host'] : req.headers.host;
+      var host = req.headers['x-forwarded-host']
+        ? req.headers['x-forwarded-host']
+        : req.headers.host;
       if (referer.indexOf(host) !== 7) {
         // only log external referers
         logger.log('info', `Referer: ${referer}`);
@@ -94,8 +96,15 @@ var handlers = {
         logger.log('info', `Serve tmp file: ${pathname}`);
 
         let mapnumber = parseInt(query.mapnumber, 10) || 0;
-        let downloadfilename = pathname.slice(-3) == 'dat' ? `map_${mapnumber}.dat` : 'map_items.zip';
-        file.serveFile(pathname, 200, { 'Content-Disposition': `attachment; filename="${downloadfilename}"` }, req, res);
+        let downloadfilename =
+          pathname.slice(-3) == 'dat' ? `map_${mapnumber}.dat` : 'map_items.zip';
+        file.serveFile(
+          pathname,
+          200,
+          { 'Content-Disposition': `attachment; filename="${downloadfilename}"` },
+          req,
+          res
+        );
       } catch (e) {
         handlers.handleError(e, res);
       }
@@ -135,6 +144,24 @@ var handlers = {
         error.http_code = 400;
         throw error;
       }
+
+      let new_dimension = '';
+      switch (dimension) {
+        case 0:
+          new_dimension = 'minecraft:overworld';
+          break;
+        case -1:
+          new_dimension = 'minecraft:the_nether';
+          break;
+        case 1:
+          new_dimension = 'minecraft:the_end';
+          break;
+        default:
+          break;
+      }
+
+      logger.log('info', new_dimension, dimension);
+
       var map_file = {
         type: TAG.COMPOUND,
         name: '',
@@ -155,8 +182,8 @@ var handlers = {
               },
               {
                 name: 'dimension',
-                type: TAG.BYTE,
-                val: dimension,
+                type: TAG.STRING,
+                val: new_dimension,
               },
               {
                 name: 'trackingPosition',
