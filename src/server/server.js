@@ -157,7 +157,9 @@ var handlers = {
           new_dimension = 'minecraft:the_end';
           break;
         default:
-          break;
+          let error = new Error('Unsupported dimension');
+          error.http_code = 400;
+          throw error;
       }
 
       logger.log('info', new_dimension, dimension);
